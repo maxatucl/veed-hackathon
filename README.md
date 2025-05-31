@@ -27,6 +27,7 @@ werkzeug
 
 ```bash
 pip install sievedata
+pip install moviepy==1.0.3
 ```
 
 ## Installation
