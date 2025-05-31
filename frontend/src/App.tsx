@@ -57,7 +57,7 @@ function App() {
       {previewUrl && (
         <div className="preview">
           <video src={previewUrl} controls width="100%" />
-          <button onClick={handleUpload}>Upload Video</button>
+          <button onClick={handleUpload}>Generate Video</button>
         </div>
       )}
     </div>

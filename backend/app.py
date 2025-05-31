@@ -35,8 +35,10 @@ def upload_video():
     filename = os.path.join(UPLOAD_FOLDER, video_file.filename)
     video_file.save(filename)
 
+    target_language = None
+    target_language = "spanish" # PLACEHOLDER
     # Extract audio from the video file
-    extract_audio(filename, video_file.filename)
+    extract_audio(filename, video_file.filename, target_language)
 
     # Generate avatar from audio and get the output URL
     avatar_name = "Niloy" # PLACEHOLDER
@@ -47,13 +49,60 @@ def upload_video():
         'video_url': video_url
     })
 
-def extract_audio(video_file, filename):
+def extract_audio(video_file, filename, target_language):
     video = VideoFileClip(video_file)
     audio = video.audio
-
     audio_path = os.path.join(AUDIO_FOLDER, filename + ".wav")
+
     audio.write_audiofile(audio_path)
 
+    if(target_language is not None):
+        translate_audio(audio_path, target_language)
+
+def translate_audio(audio_path, language):
+    source_file = sieve.File(path=audio_path)
+    target_language = language
+    translation_engine = "sieve-default-translator"
+    voice_engine = "sieve-default-cloning"
+    transcription_engine = "sieve-transcribe"
+    output_mode = "voice-dubbing"
+    edit_segments = []
+    return_transcript = False
+    preserve_background_audio = True
+    safewords = ""
+    translation_dictionary = ""
+    start_time = 0
+    end_time = -1
+    enable_lipsyncing = False
+    lipsync_backend = "sync-2.0"
+    lipsync_enhance = "default"
+
+    dubbing = sieve.function.get("sieve/dubbing")
+    output = dubbing.run(
+        source_file = source_file,
+        target_language = target_language,
+        translation_engine = translation_engine,
+        voice_engine = voice_engine,
+        transcription_engine = transcription_engine,
+        output_mode = output_mode,
+        edit_segments = edit_segments,
+        return_transcript = return_transcript,
+        preserve_background_audio = preserve_background_audio,
+        safewords = safewords,
+        translation_dictionary = translation_dictionary,
+        start_time = start_time,
+        end_time = end_time,
+        enable_lipsyncing = enable_lipsyncing,
+        lipsync_backend = lipsync_backend,
+        lipsync_enhance = lipsync_enhance
+    )
+    for output_object in output:
+        path = output_object.path
+
+        # Copy the file from Sieve's output path to our output folder
+        shutil.copy2(path, audio_path)
+        print("copied file to " + audio_path)
+    
 def avatar_generation(filename, avatar_name):
     img_path = os.path.join(AVATARS_FOLDER, avatar_name + ".jpg")
     source_image = sieve.File(path=img_path)
