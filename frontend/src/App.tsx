@@ -6,6 +6,7 @@ import './App.css';
 function App() {
   const [video, setVideo] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [language, setLanguage] = useState<string>('en'); // default to English
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
     const file = acceptedFiles[0];
@@ -30,6 +31,7 @@ function App() {
 
     const formData = new FormData();
     formData.append('video', video);
+    formData.append('language', language);
 
     try {
       const response = await axios.post('http://localhost:5000/upload', formData, {
@@ -52,6 +54,50 @@ function App() {
         ) : (
           <p>Drag and drop a video here, or click to select a video</p>
         )}
+      </div>
+
+      {/* Language Dropdown */}
+      <div style={{ marginTop: '20px' }}>
+        <label htmlFor="language-select" style={{ marginRight: '10px' }}>
+          Select Language:
+        </label>
+        <select
+          id="language-select"
+          value={language}
+          onChange={(e) => setLanguage(e.target.value)}
+          style={{ padding: '6px 10px', fontSize: '16px', borderRadius: '4px' }}
+        >
+          <option value="english">English</option>
+          <option value="hindi">Hindi</option>
+          <option value="portuguese">Portuguese</option>
+          <option value="mandarin">Mandarin</option>
+          <option value="spanish">Spanish</option>
+          <option value="french">French</option>
+          <option value="german">German</option>
+          <option value="japanese">Japanese</option>
+          <option value="arabic">Arabic</option>
+          <option value="russian">Russian</option>
+          <option value="korean">Korean</option>
+          <option value="indonesian">Indonesian</option>
+          <option value="italian">Italian</option>
+          <option value="dutch">Dutch</option>
+          <option value="turkish">Turkish</option>
+          <option value="polish">Polish</option>
+          <option value="swedish">Swedish</option>
+          <option value="tagalog">Tagalog</option>
+          <option value="malay">Malay</option>
+          <option value="romanian">Romanian</option>
+          <option value="ukrainian">Ukrainian</option>
+          <option value="greek">Greek</option>
+          <option value="czech">Czech</option>
+          <option value="danish">Danish</option>
+          <option value="finnish">Finnish</option>
+          <option value="bulgarian">Bulgarian</option>
+          <option value="croatian">Croatian</option>
+          <option value="slovak">Slovak</option>
+          <option value="tamil">Tamil</option>
+          <option value="norwegian">Norwegian</option>
+        </select>
       </div>
 
       {previewUrl && (

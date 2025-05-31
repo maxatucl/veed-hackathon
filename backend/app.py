@@ -35,8 +35,9 @@ def upload_video():
     filename = os.path.join(UPLOAD_FOLDER, video_file.filename)
     video_file.save(filename)
 
-    target_language = None
-    target_language = "spanish" # PLACEHOLDER
+    #target_language = None
+    #target_language = "spanish" # PLACEHOLDER
+    target_language = request.form.get('language', 'english')  # fallback to English if not provided
     # Extract audio from the video file
     extract_audio(filename, video_file.filename, target_language)
 
