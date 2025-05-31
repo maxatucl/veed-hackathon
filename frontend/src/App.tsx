@@ -7,6 +7,18 @@ function App() {
   const [video, setVideo] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [language, setLanguage] = useState<string | null>(null);
+  const [selectedAvatar, setSelectedAvatar] = useState<string | null>(null);
+
+  const avatars = [
+  { name: 'Alan', img: '/avatars/Alan.jpg' },
+  { name: 'Carlos', img: '/avatars/Carlos.jpg' },
+  { name: 'Katarina', img: '/avatars/Katarina.jpg' },
+  { name: 'Michael', img: '/avatars/Michael.jpg' },
+  { name: 'Niloy', img: '/avatars/Niloy.jpg' },
+  { name: 'Peter', img: '/avatars/Peter.jpg' },
+  { name: 'Priya', img: '/avatars/Priya.jpg' },
+  { name: 'Tonya', img: '/avatars/Tonya.jpg' },
+  ];
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
     const file = acceptedFiles[0];
@@ -33,6 +45,9 @@ function App() {
     formData.append('video', video);
     if (language) {
       formData.append('language', language);
+    }
+    if (selectedAvatar) {
+      formData.append('avatar', selectedAvatar);
     }
 
     try {
@@ -101,6 +116,19 @@ function App() {
           <option value="tamil">Tamil</option>
           <option value="norwegian">Norwegian</option>
         </select>
+      </div>
+
+      <div className="avatar-grid">
+        {avatars.map((avatar) => (
+          <div
+            key={avatar.name}
+            className={`avatar-button ${selectedAvatar === avatar.name ? 'selected' : ''}`}
+            onClick={() => setSelectedAvatar(avatar.name)}
+          >
+            <img src={avatar.img} alt={avatar.name} />
+            <p>{avatar.name}</p>
+          </div>
+        ))}
       </div>
 
       {previewUrl && (

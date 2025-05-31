@@ -44,7 +44,7 @@ def upload_video():
     extract_audio(filename, video_file.filename, target_language)
 
     # Generate avatar from audio and get the output URL
-    avatar_name = "Niloy" # PLACEHOLDER
+    avatar_name = request.form.get('avatar', 'Alan')  # Default to 'Alan'
     video_url = avatar_generation(video_file.filename, avatar_name)
     
     return jsonify({
