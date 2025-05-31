@@ -22,6 +22,18 @@ AVATARS_FOLDER = 'avatars'
 if not os.path.exists(AVATARS_FOLDER):
     os.makedirs(AVATARS_FOLDER)
 
+# voice dictionary
+voices = {
+    "Alan": "openai-echo (no voice cloning)",
+    "Carlos": "elevenlabs-alberto (no voice cloning)",
+    "Katarina": "openai-nova (no voice cloning)",
+    "Michael": "openai-onyx (no voice cloning)",
+    "Niloy": "sieve-default-cloning",
+    "Peter": "openai-echo (no voice cloning)",
+    "Priya": "openai-shimmer (no voice cloning)",
+    "Tonya": "openai-alloy (no voice cloning)"
+}
+
 @app.route('/upload', methods=['POST'])
 def upload_video():
     if 'video' not in request.files:
@@ -40,19 +52,19 @@ def upload_video():
     filename = os.path.join(UPLOAD_FOLDER, video_file.filename)
     video_file.save(filename)
 
-    # Extract audio from the video file
-    extract_audio(filename, video_file.filename, target_language)
-
     # Generate avatar from audio and get the output URL
     avatar_name = request.form.get('avatar', 'Alan')  # Default to 'Alan'
     video_url = avatar_generation(video_file.filename, avatar_name)
+
+    # Extract audio from the video file
+    extract_audio(filename, video_file.filename, target_language, avatar_name)
     
     return jsonify({
         'message': 'Video processed successfully',
         'video_url': video_url
     })
 
-def extract_audio(video_file, filename, target_language):
+def extract_audio(video_file, filename, target_language, avatar_name):
     video = VideoFileClip(video_file)
     audio = video.audio
     audio_path = os.path.join(AUDIO_FOLDER, filename + ".wav")
@@ -60,13 +72,13 @@ def extract_audio(video_file, filename, target_language):
     audio.write_audiofile(audio_path)
 
     if(target_language is not None):
-        translate_audio(audio_path, target_language)
+        translate_audio(audio_path, target_language, avatar_name)
 
-def translate_audio(audio_path, language):
+def translate_audio(audio_path, language, avatar_name):
     source_file = sieve.File(path=audio_path)
     target_language = language
     translation_engine = "sieve-default-translator"
-    voice_engine = "sieve-default-cloning"
+    voice_engine = voices[avatar_name]  # default "sieve-default-cloning"
     transcription_engine = "sieve-transcribe"
     output_mode = "voice-dubbing"
     edit_segments = []
