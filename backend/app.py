@@ -31,13 +31,15 @@ def upload_video():
     if video_file.filename == '':
         return jsonify({'error': 'No selected file'}), 400
 
+    # Get target language from request (None if not selected)
+    target_language = request.form.get('language', None)
+    if target_language == '':  # Convert empty string to None
+        target_language = None
+
     # Save the video file
     filename = os.path.join(UPLOAD_FOLDER, video_file.filename)
     video_file.save(filename)
 
-    #target_language = None
-    #target_language = "spanish" # PLACEHOLDER
-    target_language = request.form.get('language', 'english')  # fallback to English if not provided
     # Extract audio from the video file
     extract_audio(filename, video_file.filename, target_language)
 

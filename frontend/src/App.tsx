@@ -6,7 +6,7 @@ import './App.css';
 function App() {
   const [video, setVideo] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const [language, setLanguage] = useState<string>('en'); // default to English
+  const [language, setLanguage] = useState<string | null>(null);
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
     const file = acceptedFiles[0];
@@ -31,7 +31,9 @@ function App() {
 
     const formData = new FormData();
     formData.append('video', video);
-    formData.append('language', language);
+    if (language) {
+      formData.append('language', language);
+    }
 
     try {
       const response = await axios.post('http://localhost:5000/upload', formData, {
@@ -59,14 +61,15 @@ function App() {
       {/* Language Dropdown */}
       <div style={{ marginTop: '20px' }}>
         <label htmlFor="language-select" style={{ marginRight: '10px' }}>
-          Select Language:
+          Select Language (Optional):
         </label>
         <select
           id="language-select"
-          value={language}
-          onChange={(e) => setLanguage(e.target.value)}
+          value={language || ''}
+          onChange={(e) => setLanguage(e.target.value || null)}
           style={{ padding: '6px 10px', fontSize: '16px', borderRadius: '4px' }}
         >
+          <option value="">No translation</option>
           <option value="english">English</option>
           <option value="hindi">Hindi</option>
           <option value="portuguese">Portuguese</option>
@@ -103,7 +106,9 @@ function App() {
       {previewUrl && (
         <div className="preview">
           <video src={previewUrl} controls width="100%" />
-          <button onClick={handleUpload}>Generate Video</button>
+          <button onClick={handleUpload}>
+            Generate Video
+          </button>
         </div>
       )}
     </div>
