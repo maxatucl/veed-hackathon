@@ -54,10 +54,12 @@ def upload_video():
 
     # Generate avatar from audio and get the output URL
     avatar_name = request.form.get('avatar', 'Alan')  # Default to 'Alan'
-    video_url = avatar_generation(video_file.filename, avatar_name)
 
     # Extract audio from the video file
     extract_audio(filename, video_file.filename, target_language, avatar_name)
+
+    # Generate avatar from audio
+    video_url = avatar_generation(video_file.filename, avatar_name)
     
     return jsonify({
         'message': 'Video processed successfully',
@@ -71,12 +73,14 @@ def extract_audio(video_file, filename, target_language, avatar_name):
 
     audio.write_audiofile(audio_path)
 
-    if(target_language is not None):
-        translate_audio(audio_path, target_language, avatar_name)
+    if(avatar_name == "Niloy" and target_language is None):
+        return
+        
+    translate_audio(audio_path, target_language, avatar_name)
 
 def translate_audio(audio_path, language, avatar_name):
     source_file = sieve.File(path=audio_path)
-    target_language = language
+    target_language = "english" if language is None else language
     translation_engine = "sieve-default-translator"
     voice_engine = voices[avatar_name]  # default "sieve-default-cloning"
     transcription_engine = "sieve-transcribe"
