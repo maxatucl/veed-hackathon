@@ -25,6 +25,10 @@ python-dotenv
 werkzeug
 ```
 
+```bash
+pip install sievedata
+```
+
 ## Installation
 1. Clone & Navigate to Repo
 
@@ -36,4 +40,7 @@ npm start
 
 cd ../backend
 python app.py
+
+sieve login
+*enter API key*
 ```
