@@ -30,6 +30,7 @@ werkzeug
 ```bash
 pip install sievedata
 pip install moviepy==1.0.3
+pip install elevenlabs
 ```
 
 ## Installation
@@ -39,6 +40,7 @@ pip install moviepy==1.0.3
 cd frontend
 npm install
 npm install react-scripts
+npm install react-router-dom
 npm start
 
 cd ../backend
