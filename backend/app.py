@@ -9,6 +9,7 @@ from elevenlabs.client import ElevenLabs
 from elevenlabs import play
 import json
 import subprocess
+from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
 CORS(app)
@@ -26,6 +27,21 @@ if not os.path.exists(AUDIO_FOLDER):
 AVATARS_FOLDER = 'avatars'
 if not os.path.exists(AVATARS_FOLDER):
     os.makedirs(AVATARS_FOLDER)
+
+# Clean up any existing Custom.jpg on startup
+custom_avatar_path = os.path.join(AVATARS_FOLDER, "Custom.jpg")
+if os.path.exists(custom_avatar_path):
+    try:
+        os.remove(custom_avatar_path)
+    except:
+        print("Could not remove existing Custom.jpg")
+
+overlayed_video_path = OUTPUT_FOLDER + "/" + "out.mp4"
+if os.path.exists(overlayed_video_path):
+    try:
+        os.remove(overlayed_video_path)
+    except:
+        print("Could not remove existing out.mp4")
 
 # voice dictionary
 voices = {
@@ -60,6 +76,14 @@ def upload_video():
     if video_file.filename == '':
         return jsonify({'error': 'No selected file'}), 400
 
+    # Get avatar name first
+    avatar_name = request.form.get('avatar', 'Alan')  # Default to 'Alan'
+    
+    # Check for custom avatar
+    custom_avatar_path = os.path.join(AVATARS_FOLDER, "Custom.jpg")
+    if avatar_name == "Custom" and not os.path.exists(custom_avatar_path):
+        return jsonify({'error': 'Custom avatar not found'}), 400
+
     # Get target language from request (None if not selected)
     target_language = request.form.get('language', None)
     if target_language == '':  # Convert empty string to None
@@ -69,14 +93,11 @@ def upload_video():
     filename = os.path.join(UPLOAD_FOLDER, video_file.filename)
     video_file.save(filename)
 
-    # Generate avatar from audio and get the output URL
-    avatar_name = request.form.get('avatar', 'Alan')  # Default to 'Alan'
-
     # Extract audio from the video file
     extract_audio(filename, video_file.filename, target_language, avatar_name)
 
     # Generate avatar from audio
-    video_url = avatar_generation(video_file.filename, avatar_name)
+    avatar_generation(video_file.filename, avatar_name)
 
     # Peter voice changer extra case
     if(avatar_name == "Peter"):
@@ -218,7 +239,7 @@ def translate_audio(audio_path, language, avatar_name):
     source_file = sieve.File(path=audio_path)
     target_language = "english" if language is None else language
     translation_engine = "sieve-default-translator"
-    voice_engine = voices[avatar_name]  # default "sieve-default-cloning"
+    voice_engine = "openai-echo (no voice cloning)" if avatar_name == "Custom" else voices[avatar_name]  # default "sieve-default-cloning"
     transcription_engine = "sieve-transcribe"
     output_mode = "voice-dubbing"
     edit_segments = []
@@ -298,6 +319,10 @@ def avatar_generation(filename, avatar_name):
 @app.route('/video/<filename>')
 def serve_video(filename):
     return send_from_directory(OUTPUT_FOLDER, filename)
+
+@app.route('/avatars/<path:filename>')
+def serve_avatar(filename):
+    return send_from_directory(AVATARS_FOLDER, filename)
 
 def find_moment(video_path, query):
     video = sieve.File(path=video_path)
@@ -388,6 +413,28 @@ def handle_question():
 
     response = ask_question(video_path, user_prompt)
     return jsonify({'response': response})
+
+@app.route('/upload-avatar', methods=['POST'])
+def upload_avatar():
+    if 'avatar' not in request.files:
+        return jsonify({'error': 'No avatar file provided'}), 400
+    
+    avatar_file = request.files['avatar']
+    if avatar_file.filename == '':
+        return jsonify({'error': 'No selected file'}), 400
+
+    if not avatar_file.filename.lower().endswith('.jpg'):
+        return jsonify({'error': 'Only JPG files are allowed'}), 400
+
+    # Secure the filename and save
+    filename = secure_filename('Custom.jpg')
+    avatar_path = os.path.join(AVATARS_FOLDER, filename)
+    avatar_file.save(avatar_path)
+
+    return jsonify({
+        'message': 'Avatar uploaded successfully',
+        'avatar_name': 'Custom'
+    })
 
 if __name__ == '__main__':
     app.run(debug=True) 

@@ -10,6 +10,7 @@ function App() {
   const [selectedAvatar, setSelectedAvatar] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [generatedVideoUrl, setGeneratedVideoUrl] = useState<string | null>(null);
+  const [customAvatarUrl, setCustomAvatarUrl] = useState<string | null>(null);
 
   const [query, setQuery] = useState('')
   const [response, setResponse] = useState('')
@@ -42,6 +43,40 @@ function App() {
     onDrop,
     accept: {
       'video/*': []
+    },
+    multiple: false
+  });
+
+  const onAvatarDrop = useCallback(async (acceptedFiles: File[]) => {
+    const file = acceptedFiles[0];
+    if (file && file.type === 'image/jpeg') {
+      const formData = new FormData();
+      formData.append('avatar', file);
+
+      try {
+        await axios.post('http://localhost:5000/upload-avatar', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        });
+        
+        // Create a URL for preview and force a cache-busting timestamp
+        const timestamp = new Date().getTime();
+        setCustomAvatarUrl(`http://localhost:5000/avatars/Custom.jpg?t=${timestamp}`);
+        setSelectedAvatar('Custom');
+      } catch (error) {
+        console.error('Avatar upload failed:', error);
+        alert('Failed to upload custom avatar. Please try again.');
+      }
+    } else {
+      alert('Please upload a JPG image file');
+    }
+  }, []);
+
+  const { getRootProps: getAvatarRootProps, getInputProps: getAvatarInputProps, isDragActive: isAvatarDragActive } = useDropzone({
+    onDrop: onAvatarDrop,
+    accept: {
+      'image/jpeg': ['.jpg', '.jpeg']
     },
     multiple: false
   });
@@ -158,17 +193,57 @@ function App() {
         </select>
       </div>
 
-      <div className="avatar-grid">
-        {avatars.map((avatar) => (
-          <div
-            key={avatar.name}
-            className={`avatar-button ${selectedAvatar === avatar.name ? 'selected' : ''}`}
-            onClick={() => setSelectedAvatar(avatar.name)}
-          >
-            <img src={avatar.img} alt={avatar.name} />
-            <p>{avatar.name}</p>
+      <div className="avatar-section">
+        <h3>Choose an Avatar</h3>
+        <div className="avatar-container">
+          <div className="avatar-grid">
+            {avatars.map((avatar) => (
+              <div
+                key={avatar.name}
+                className={`avatar-button ${selectedAvatar === avatar.name ? 'selected' : ''}`}
+                onClick={() => setSelectedAvatar(avatar.name)}
+              >
+                <img src={`http://localhost:5000/avatars/${avatar.name}.jpg`} alt={avatar.name} />
+                <p>{avatar.name}</p>
+              </div>
+            ))}
           </div>
-        ))}
+
+          <div className="avatar-divider">
+            <span>OR</span>
+          </div>
+
+          <div
+            {...getAvatarRootProps()}
+            className={`custom-avatar-dropzone ${selectedAvatar === 'Custom' ? 'selected' : ''}`}
+          >
+            <input {...getAvatarInputProps()} />
+            {customAvatarUrl ? (
+              <>
+                <img 
+                  src={customAvatarUrl} 
+                  alt="Custom" 
+                  onError={() => {
+                    setCustomAvatarUrl(null);
+                    setSelectedAvatar(null);
+                  }}
+                />
+                <p>Custom Avatar</p>
+              </>
+            ) : (
+              <div className="upload-placeholder">
+                {isAvatarDragActive ? (
+                  <p>Drop your avatar here...</p>
+                ) : (
+                  <>
+                    <p>+ Upload Custom Avatar</p>
+                    <small>(JPG only)</small>
+                  </>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
       </div>
 
       <div style={{ marginTop: 40, padding: 10, border: '1px solid #ccc', borderRadius: 8 }}>
