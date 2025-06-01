@@ -9,6 +9,9 @@ function App() {
   const [language, setLanguage] = useState<string | null>(null);
   const [selectedAvatar, setSelectedAvatar] = useState<string | null>(null);
 
+  const [query, setQuery] = useState('')
+  const [response, setResponse] = useState('')
+
   const avatars = [
   { name: 'Alan', img: '/avatars/Alan.jpg' },
   { name: 'Carlos', img: '/avatars/Carlos.jpg' },
@@ -37,6 +40,18 @@ function App() {
     },
     multiple: false
   });
+
+  const handleQuerySubmit = async () => {
+    if (!query.trim()) return
+
+    try {
+      const res = await axios.post('http://localhost:5000/query', { query })
+      setResponse(res.data.response)
+    } catch (error) {
+      setResponse('Error contacting server')
+      console.error(error)
+    }
+  }
 
   const handleUpload = async () => {
     if (!video) return;
@@ -130,6 +145,30 @@ function App() {
           </div>
         ))}
       </div>
+
+      <div style={{ marginTop: 40, padding: 10, border: '1px solid #ccc', borderRadius: 8 }}>
+        <h2>Moment Matcher</h2>
+        <h4>Search for when a particular topic or concept occured during the video:</h4>
+        <input
+          type="text"
+          value={query}
+          onChange={e => setQuery(e.target.value)}
+          placeholder="Enter your query here"
+          style={{ width: '80%', padding: 8, fontSize: 16, borderRadius: 4, border: '1px solid #aaa' }}
+        />
+        <button
+          onClick={handleQuerySubmit}
+          style={{ marginLeft: 10, padding: '8px 16px', fontSize: 16, borderRadius: 4 }}
+        >
+          Submit
+        </button>
+        {response && (
+          <div style={{ marginTop: 20, whiteSpace: 'pre-wrap' }}>
+            <strong>Response:</strong> {response}
+          </div>
+        )}
+      </div>
+
 
       {previewUrl && (
         <div className="preview">

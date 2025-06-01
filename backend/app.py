@@ -163,5 +163,62 @@ def avatar_generation(filename, avatar_name):
 def serve_video(filename):
     return send_from_directory(OUTPUT_FOLDER, filename)
 
+def find_moment(video_path, query):
+    video = sieve.File(url=video_path)
+    query = query
+    min_clip_length = 3
+    start_time = 0
+    end_time = -1
+    render = True
+
+    moments = sieve.function.get("sieve/moments")
+    output = moments.run(
+        video = video,
+        query = query,
+        min_clip_length = min_clip_length,
+        start_time = start_time,
+        end_time = end_time,
+        render = render
+    )
+
+    def format_time(seconds):
+        minutes = int(seconds) // 60
+        secs = int(seconds) % 60
+        return f"{minutes}:{secs:02d}"
+
+    start_times = []
+    for output_object in output:
+        start_times.append(output_object[1]["start_time"])
+
+    if not start_times:
+        result = "This topic is not mentioned."
+    elif len(start_times) == 1:
+        time_str = format_time(start_times[0])
+        result = f"This topic is mentioned at time point: {time_str}"
+    else:
+        formatted_times = [format_time(t) for t in start_times]
+        # Join all but last with commas, add 'and' before last
+        formatted_str = ", ".join(formatted_times[:-1])
+        formatted_str += f" and {formatted_times[-1]}"
+        result = f"This topic is mentioned at time points: {formatted_str}"
+
+    return result
+
+@app.route('/query', methods=['POST'])
+def handle_query():
+    data = request.json
+    user_query = data.get('query', '')
+
+    if os.path.isfile("output/generated_avatar_peter.mp4"):
+        video_path = OUTPUT_FOLDER + 'generated_avatar_peter.mp4'
+    else:
+        video_path = OUTPUT_FOLDER + 'generated_avatar.mp4'
+    
+    # For now, just echo back the query or you can add real processing logic here
+    #response_text = f"You asked: {user_query}"
+    response_text = find_moment(video_path, user_query)
+    
+    return jsonify({'response': response_text})
+
 if __name__ == '__main__':
     app.run(debug=True) 
