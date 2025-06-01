@@ -8,6 +8,7 @@ from dotenv import dotenv_values
 from elevenlabs.client import ElevenLabs
 from elevenlabs import play
 import json
+import subprocess
 
 app = Flask(__name__)
 CORS(app)
@@ -101,11 +102,105 @@ def upload_video():
 
         # Export the result
         video_with_new_audio.write_videofile(OUTPUT_FOLDER + "/" + "generated_avatar_peter.mp4")
+
+    avatar_video_string = OUTPUT_FOLDER + "/" + "generated_avatar_peter.mp4" if avatar_name == "Peter" else OUTPUT_FOLDER + "/" + "generated_avatar.mp4"
+    
+    # Run your overlay function
+    output_video = overlay_video(avatar_video_string, filename)
+
+    # Get audio from the original avatar video
+    original_video = VideoFileClip(avatar_video_string)
+    original_audio = original_video.audio
+
+    # Optional: write to .wav if needed (e.g., for ElevenLabs or debugging)
+    audio_path = os.path.join(AUDIO_FOLDER, "out.wav")
+    original_audio.write_audiofile(audio_path)
+
+    # Load new video (with overlay but no audio)
+    video_no_audio = VideoFileClip(output_video)
+
+    # Attach the original audio to the new video
+    final_video = video_no_audio.set_audio(original_audio)
+
+    # Save final result
+    final_video.write_videofile(os.path.join(OUTPUT_FOLDER, "final_video.mp4"))
     
     return jsonify({
         'message': 'Video processed successfully',
         'video_url': video_url
     })
+
+def overlay_video(avatar_video_path, background_video_path):
+    foreground_video_path = remove_background(avatar_video_path)
+
+    # Define input and output file paths
+    output_video = OUTPUT_FOLDER + "/" + "out.mp4"
+
+    # Construct the FFmpeg filter_complex
+    filter_complex = (
+        "[1:v]colorkey=0x00FF00:0.3:0.2[ckout];"
+        "[0:v]trim=start=0:end=8[cut0];"
+        "[cut0][ckout]overlay=x=(W-w-10):y=(H-h-2)[out]"
+    )
+    print("background_video: " + background_video_path)
+    print("foreground_video: " + foreground_video_path)
+    print("output_video: " + output_video)
+
+    # Build the full ffmpeg command
+    command = [
+        "ffmpeg",
+        "-i", background_video_path,
+        "-i", foreground_video_path,
+        "-filter_complex", filter_complex,
+        "-map", "[out]",
+        output_video
+    ]
+
+    # Run the command
+    try:
+        subprocess.run(command, check=True)
+        print("Video compositing complete! Output saved to:", output_video)
+        return output_video
+    except subprocess.CalledProcessError as e:
+        print("Error during FFmpeg execution:", e)
+        return None
+
+def remove_background(video_path):
+
+    input_file = sieve.File(path=video_path)
+
+    backend = "parallax"
+    background_color_rgb = "0,255,0"
+    background_media = sieve.File(url="")
+    output_type = "masked_frame"
+    video_output_format = "mp4"
+    yield_output_batches = False
+    start_frame = 0
+    end_frame = -1
+    vanish_allow_scene_splitting = True
+
+    background_removal = sieve.function.get("sieve/background-removal")
+    outputs = background_removal.run(
+        input_file = input_file,
+        backend = backend,
+        background_color_rgb = background_color_rgb,
+        background_media = background_media,
+        output_type = output_type,
+        video_output_format = video_output_format,
+        yield_output_batches = yield_output_batches,
+        start_frame = start_frame,
+        end_frame = end_frame,
+        vanish_allow_scene_splitting = vanish_allow_scene_splitting
+    )
+    output_path = OUTPUT_FOLDER + "/" + "avatar_no_background.mp4"
+    for output_object in outputs:
+        path = output_object.path
+
+        # Copy the file from Sieve's output path to our output folder
+        shutil.copy2(path, output_path)
+        print("copied file to " + output_path)
+
+    return output_path
 
 def extract_audio(video_file, filename, target_language, avatar_name):
     video = VideoFileClip(video_file)
