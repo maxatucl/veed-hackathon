@@ -28,7 +28,7 @@ voices = {
     "Carlos": "elevenlabs-alberto (no voice cloning)",
     "Katarina": "openai-nova (no voice cloning)",
     "Michael": "openai-onyx (no voice cloning)",
-    "Niloy": "sieve-default-cloning",
+    "Professor": "sieve-default-cloning",
     "Peter": "openai-echo (no voice cloning)",
     "Priya": "openai-shimmer (no voice cloning)",
     "Tonya": "openai-alloy (no voice cloning)"
@@ -73,7 +73,7 @@ def extract_audio(video_file, filename, target_language, avatar_name):
 
     audio.write_audiofile(audio_path)
 
-    if(avatar_name == "Niloy" and target_language is None):
+    if(avatar_name == "Professor" and target_language is None):
         return
         
     translate_audio(audio_path, target_language, avatar_name)

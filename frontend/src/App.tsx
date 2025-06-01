@@ -14,7 +14,7 @@ function App() {
   { name: 'Carlos', img: '/avatars/Carlos.jpg' },
   { name: 'Katarina', img: '/avatars/Katarina.jpg' },
   { name: 'Michael', img: '/avatars/Michael.jpg' },
-  { name: 'Niloy', img: '/avatars/Niloy.jpg' },
+  { name: 'Professor', img: '/avatars/Professor.jpg' },
   { name: 'Peter', img: '/avatars/Peter.jpg' },
   { name: 'Priya', img: '/avatars/Priya.jpg' },
   { name: 'Tonya', img: '/avatars/Tonya.jpg' },
