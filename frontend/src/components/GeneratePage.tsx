@@ -111,7 +111,7 @@ function GeneratePage() {
 
   return (
     <div className="App">
-      <h1>Video Avatar Generator</h1>
+      <h1>Avatarcademy</h1>
       <div {...getRootProps()} className="dropzone">
         <input {...getInputProps()} />
         {isDragActive ? (
