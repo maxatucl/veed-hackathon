@@ -2,8 +2,12 @@ from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 import os
 import sieve
-from moviepy.editor import VideoFileClip
+from moviepy.editor import VideoFileClip, AudioFileClip
 import shutil
+from dotenv import dotenv_values
+from elevenlabs.client import ElevenLabs
+from elevenlabs import play
+import json
 
 app = Flask(__name__)
 CORS(app)
@@ -34,6 +38,18 @@ voices = {
     "Tonya": "openai-alloy (no voice cloning)"
 }
 
+config = dotenv_values(".env")
+ 
+client = ElevenLabs(
+    api_key=config["ELEVENLABS_API_KEY"]
+)
+ 
+params = {
+    "similarity": 0.0,
+    "stability": 0.5,
+    "style": 1.0
+}
+
 @app.route('/upload', methods=['POST'])
 def upload_video():
     if 'video' not in request.files:
@@ -60,6 +76,31 @@ def upload_video():
 
     # Generate avatar from audio
     video_url = avatar_generation(video_file.filename, avatar_name)
+
+    # Peter voice changer extra case
+    if(avatar_name == "Peter"):
+        video = OUTPUT_FOLDER + "/" + "generated_avatar.mp4"
+        voiceChangerResponse = client.speech_to_speech.convert(
+            voice_id="73bEoGuG1oV5QCnHySQj",
+            output_format="mp3_44100_128",
+            model_id="eleven_multilingual_sts_v2",
+            audio=open(video, "rb"),
+            voice_settings=json.dumps(params),
+        )
+
+        with open("temp.mp3", "wb") as f:
+            for x in voiceChangerResponse:
+                f.write(x)
+        
+        # Load the video and audio
+        video = VideoFileClip(video)
+        audio = AudioFileClip("temp.mp3")
+
+        # Set the new audio
+        video_with_new_audio = video.set_audio(audio)
+
+        # Export the result
+        video_with_new_audio.write_videofile(OUTPUT_FOLDER + "/" + "generated_avatar_peter.mp4")
     
     return jsonify({
         'message': 'Video processed successfully',
