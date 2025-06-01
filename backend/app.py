@@ -205,7 +205,7 @@ def serve_video(filename):
     return send_from_directory(OUTPUT_FOLDER, filename)
 
 def find_moment(video_path, query):
-    video = sieve.File(url=video_path)
+    video = sieve.File(path=video_path)
     query = query
     min_clip_length = 3
     start_time = 0
@@ -251,9 +251,9 @@ def handle_query():
     user_query = data.get('query', '')
 
     if os.path.isfile("output/generated_avatar_peter.mp4"):
-        video_path = OUTPUT_FOLDER + 'generated_avatar_peter.mp4'
+        video_path = OUTPUT_FOLDER + '/generated_avatar_peter.mp4'
     else:
-        video_path = OUTPUT_FOLDER + 'generated_avatar.mp4'
+        video_path = OUTPUT_FOLDER + '/generated_avatar.mp4'
     
     # For now, just echo back the query or you can add real processing logic here
     #response_text = f"You asked: {user_query}"
