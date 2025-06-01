@@ -58,8 +58,7 @@ voices = {
     "Michael": "openai-onyx (no voice cloning)",
     "Professor": "sieve-default-cloning",
     "Peter": "openai-echo (no voice cloning)",
-    "Priya": "openai-shimmer (no voice cloning)",
-    "Tonya": "openai-alloy (no voice cloning)"
+    "Priya": "openai-shimmer (no voice cloning)"
 }
 
 config = dotenv_values(".env")

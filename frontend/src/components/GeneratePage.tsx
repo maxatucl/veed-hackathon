@@ -20,7 +20,6 @@ function GeneratePage() {
     { name: 'Professor', img: '/avatars/Professor.jpg' },
     { name: 'Peter', img: '/avatars/Peter.jpg' },
     { name: 'Priya', img: '/avatars/Priya.jpg' },
-    { name: 'Tonya', img: '/avatars/Tonya.jpg' },
   ];
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
@@ -180,41 +179,32 @@ function GeneratePage() {
                 <p>{avatar.name}</p>
               </div>
             ))}
-          </div>
-
-          <div className="avatar-divider">
-            <span>OR</span>
-          </div>
-
-          <div
-            {...getAvatarRootProps()}
-            className={`custom-avatar-dropzone ${selectedAvatar === 'Custom' ? 'selected' : ''}`}
-          >
-            <input {...getAvatarInputProps()} />
-            {customAvatarUrl ? (
-              <>
-                <img 
-                  src={customAvatarUrl} 
-                  alt="Custom" 
-                  onError={() => {
+            <div
+              {...getAvatarRootProps()}
+              className={`avatar-button custom-avatar-button ${selectedAvatar === 'Custom' ? 'selected' : ''}`}
+            >
+              <input {...getAvatarInputProps()} />
+              {customAvatarUrl ? (
+                <>
+                  <img src={customAvatarUrl} alt="Custom" onError={() => {
                     setCustomAvatarUrl(null);
                     setSelectedAvatar(null);
-                  }}
-                />
-                <p>Custom Avatar</p>
-              </>
-            ) : (
-              <div className="upload-placeholder">
-                {isAvatarDragActive ? (
-                  <p>Drop your avatar here...</p>
-                ) : (
-                  <>
-                    <p>+ Upload Custom Avatar</p>
-                    <small>(JPG only)</small>
-                  </>
-                )}
-              </div>
-            )}
+                  }} />
+                  <p>Custom Avatar</p>
+                </>
+              ) : (
+                <div className="upload-placeholder">
+                  {isAvatarDragActive ? (
+                    <p>Drop here...</p>
+                  ) : (
+                    <>
+                      <p>+ Upload Custom</p>
+                      <small>(JPG only)</small>
+                    </>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>

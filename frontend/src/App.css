@@ -142,31 +142,37 @@ select:focus {
   font-weight: 500;
 }
 
-/* Custom avatar dropzone */
-.custom-avatar-dropzone {
-  width: 200px;
-  height: 200px;
+.custom-avatar-button {
   border: 2px dashed #6c63ff;
-  border-radius: 12px;
-  overflow: hidden;
-  cursor: pointer;
-  transition: all 0.3s;
-  background-color: #f8f9fa;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  background-color: #f8f9fa;
 }
 
-.custom-avatar-dropzone:hover {
+.custom-avatar-button:hover {
   background-color: #f0f0ff;
-  transform: translateY(-2px);
 }
 
-.custom-avatar-dropzone.selected {
-  border-color: #6c63ff;
-  background-color: #f0f0ff;
-  box-shadow: 0 4px 12px rgba(108, 99, 255, 0.2);
+.custom-avatar-button .upload-placeholder {
+  height: 140px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #6c63ff;
+}
+
+.custom-avatar-button .upload-placeholder p {
+  color: #6c63ff;
+  margin: 0;
+}
+
+.custom-avatar-button .upload-placeholder small {
+  color: #666;
+  margin-top: 5px;
 }
 
 /* Preview section */
