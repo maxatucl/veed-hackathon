@@ -16,6 +16,8 @@ Features:
 - OR interactive Questions? Can ask Professor/Avatar and get a response
 
 ## Requirements
+Create a file named `.env` in the `backend` folder and add your elevenLabs API key to it as `ELEVENLABS_API_KEY=*insert API key here*`
+
 Make sure following python3 packages are installed:
 
 ```python
