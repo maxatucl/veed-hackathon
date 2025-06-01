@@ -16,10 +16,13 @@ function ResultPage() {
   const [queryResponse, setQueryResponse] = useState('');
   const [prompt, setPrompt] = useState('');
   const [promptResponse, setPromptResponse] = useState('');
+  const [isQueryLoading, setIsQueryLoading] = useState(false);
+  const [isPromptLoading, setIsPromptLoading] = useState(false);
 
   const handleQuerySubmit = async () => {
     if (!query.trim()) return;
 
+    setIsQueryLoading(true);
     try {
       const res = await axios.post('http://localhost:5000/query', { query });
       setQueryResponse(res.data.response);
@@ -27,11 +30,13 @@ function ResultPage() {
       setQueryResponse('Error contacting server');
       console.error(error);
     }
+    setIsQueryLoading(false);
   };
 
   const handlePromptSubmit = async () => {
     if (!prompt.trim()) return;
 
+    setIsPromptLoading(true);
     try {
       const res = await axios.post('http://localhost:5000/question', { prompt });
       setPromptResponse(res.data.response);
@@ -39,6 +44,7 @@ function ResultPage() {
       setPromptResponse('Error contacting server');
       console.error(error);
     }
+    setIsPromptLoading(false);
   };
 
   return (
@@ -65,8 +71,22 @@ function ResultPage() {
               onChange={e => setQuery(e.target.value)}
               placeholder="Enter your query here"
               onKeyPress={e => e.key === 'Enter' && handleQuerySubmit()}
+              disabled={isQueryLoading}
             />
-            <button onClick={handleQuerySubmit}>Search</button>
+            <button 
+              onClick={handleQuerySubmit}
+              disabled={isQueryLoading}
+              className={isQueryLoading ? 'loading' : ''}
+            >
+              {isQueryLoading ? (
+                <>
+                  <div className="spinner"></div>
+                  <span>Searching...</span>
+                </>
+              ) : (
+                'Search'
+              )}
+            </button>
           </div>
           {queryResponse && (
             <div className="response">
@@ -86,8 +106,22 @@ function ResultPage() {
               onChange={e => setPrompt(e.target.value)}
               placeholder="Enter your question here"
               onKeyPress={e => e.key === 'Enter' && handlePromptSubmit()}
+              disabled={isPromptLoading}
             />
-            <button onClick={handlePromptSubmit}>Ask</button>
+            <button 
+              onClick={handlePromptSubmit}
+              disabled={isPromptLoading}
+              className={isPromptLoading ? 'loading' : ''}
+            >
+              {isPromptLoading ? (
+                <>
+                  <div className="spinner"></div>
+                  <span>Processing...</span>
+                </>
+              ) : (
+                'Ask'
+              )}
+            </button>
           </div>
           {promptResponse && (
             <div className="response">
