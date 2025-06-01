@@ -43,6 +43,13 @@ if os.path.exists(overlayed_video_path):
     except:
         print("Could not remove existing out.mp4")
 
+peter_griffin_video = OUTPUT_FOLDER + "/" + "generated_avatar_peter.mp4"
+if os.path.exists(peter_griffin_video):
+    try:
+        os.remove(peter_griffin_video)
+    except:
+        print("Could not remove existing generated_avatar_peter.mp4")
+
 # voice dictionary
 voices = {
     "Alan": "openai-echo (no voice cloning)",
