@@ -8,6 +8,8 @@ function App() {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [language, setLanguage] = useState<string | null>(null);
   const [selectedAvatar, setSelectedAvatar] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [generatedVideoUrl, setGeneratedVideoUrl] = useState<string | null>(null);
 
   const [query, setQuery] = useState('')
   const [response, setResponse] = useState('')
@@ -56,6 +58,9 @@ function App() {
   const handleUpload = async () => {
     if (!video) return;
 
+    setIsLoading(true);
+    setGeneratedVideoUrl(null);
+
     const formData = new FormData();
     formData.append('video', video);
     if (language) {
@@ -72,8 +77,12 @@ function App() {
         }
       });
       console.log('Upload successful:', response.data);
+      setGeneratedVideoUrl(`http://localhost:5000/video/${response.data.video_url}`);
     } catch (error) {
       console.error('Upload failed:', error);
+      alert('Failed to generate video. Please try again.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -173,9 +182,26 @@ function App() {
       {previewUrl && (
         <div className="preview">
           <video src={previewUrl} controls width="100%" />
-          <button onClick={handleUpload}>
-            Generate Video
+          <button 
+            onClick={handleUpload}
+            disabled={isLoading || !selectedAvatar}
+            className={isLoading ? 'loading' : ''}
+          >
+            {isLoading ? (
+              <>
+                <div className="spinner"></div>
+                Generating Video...
+              </>
+            ) : (
+              'Generate Video'
+            )}
           </button>
+          {generatedVideoUrl && (
+            <div className="generated-video">
+              <h3>Generated Video:</h3>
+              <video src={generatedVideoUrl} controls width="100%" />
+            </div>
+          )}
         </div>
       )}
     </div>
