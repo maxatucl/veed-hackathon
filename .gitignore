@@ -9,6 +9,7 @@
 backend/uploads/
 backend/output/
 backend/audio/
+backend/temp.mp3
 
 # Logs
 *.log
