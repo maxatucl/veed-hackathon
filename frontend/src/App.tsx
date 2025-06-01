@@ -93,7 +93,7 @@ function App() {
         }
       });
       console.log('Upload successful:', response.data);
-      setGeneratedVideoUrl(`http://localhost:5000/video/${response.data.video_url}`);
+      setGeneratedVideoUrl(`http://localhost:5000/video/final_video.mp4`);
     } catch (error) {
       console.error('Upload failed:', error);
       alert('Failed to generate video. Please try again.');
@@ -229,16 +229,21 @@ function App() {
             {isLoading ? (
               <>
                 <div className="spinner"></div>
-                Generating Video...
+                Processing Video...
               </>
             ) : (
               'Generate Video'
             )}
           </button>
-          {generatedVideoUrl && (
+          {generatedVideoUrl && !isLoading && (
             <div className="generated-video">
               <h3>Generated Video:</h3>
-              <video src={generatedVideoUrl} controls width="100%" />
+              <video 
+                src={generatedVideoUrl} 
+                controls 
+                width="100%"
+                key={generatedVideoUrl}
+              />
             </div>
           )}
         </div>

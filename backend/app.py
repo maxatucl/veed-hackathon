@@ -127,7 +127,7 @@ def upload_video():
     
     return jsonify({
         'message': 'Video processed successfully',
-        'video_url': video_url
+        'video_url': 'final_video.mp4'
     })
 
 def overlay_video(avatar_video_path, background_video_path):
