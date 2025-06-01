@@ -14,6 +14,9 @@ function App() {
   const [query, setQuery] = useState('')
   const [response, setResponse] = useState('')
 
+  const [prompt, setPrompt] = useState('');
+  const [promptResponse, setPromptResponse] = useState('');
+
   const avatars = [
   { name: 'Alan', img: '/avatars/Alan.jpg' },
   { name: 'Carlos', img: '/avatars/Carlos.jpg' },
@@ -54,6 +57,19 @@ function App() {
       console.error(error)
     }
   }
+
+  const handlePromptSubmit = async () => {
+  if (!prompt.trim()) return;
+
+  try {
+    const res = await axios.post('http://localhost:5000/question', { prompt });
+    setPromptResponse(res.data.response);
+  } catch (error) {
+    setPromptResponse('Error contacting server');
+    console.error(error);
+  }
+};
+
 
   const handleUpload = async () => {
     if (!video) return;
@@ -157,7 +173,7 @@ function App() {
 
       <div style={{ marginTop: 40, padding: 10, border: '1px solid #ccc', borderRadius: 8 }}>
         <h2>Moment Matcher</h2>
-        <h4>Search for when a particular topic or concept occured during the video:</h4>
+        <h4>Search for when a particular topic or concept occurred during the video:</h4>
         <input
           type="text"
           value={query}
@@ -176,27 +192,27 @@ function App() {
             <strong>Response:</strong> {response}
           </div>
         )}
-      </div>
 
-      <div style={{ marginTop: 40, padding: 10, border: '1px solid #ccc', borderRadius: 8 }}>
+        <hr style={{ margin: '40px 0' }} />
+
         <h2>Ask a Question</h2>
-        <h4>Prompt for a summary or further explanation</h4>
+        <h4>Ask any question related to the video content:</h4>
         <input
           type="text"
-          value={query}
-          onChange={e => setQuery(e.target.value)}
-          placeholder="Enter your query here"
+          value={prompt}
+          onChange={e => setPrompt(e.target.value)}
+          placeholder="Enter your question here"
           style={{ width: '80%', padding: 8, fontSize: 16, borderRadius: 4, border: '1px solid #aaa' }}
         />
         <button
-          onClick={handleQuerySubmit}
+          onClick={handlePromptSubmit}
           style={{ marginLeft: 10, padding: '8px 16px', fontSize: 16, borderRadius: 4 }}
         >
           Submit
         </button>
-        {response && (
+        {promptResponse && (
           <div style={{ marginTop: 20, whiteSpace: 'pre-wrap' }}>
-            <strong>Response:</strong> {response}
+            <strong>Response:</strong> {promptResponse}
           </div>
         )}
       </div>

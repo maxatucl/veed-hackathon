@@ -281,5 +281,18 @@ def handle_query():
     
     return jsonify({'response': response_text})
 
+@app.route('/question', methods=['POST'])
+def handle_question():
+    data = request.json
+    user_prompt = data.get('prompt', '')
+
+    if os.path.isfile("output/generated_avatar_peter.mp4"):
+        video_path = OUTPUT_FOLDER + '/generated_avatar_peter.mp4'
+    else:
+        video_path = OUTPUT_FOLDER + '/generated_avatar.mp4'
+
+    response = ask_question(video_path, user_prompt)
+    return jsonify({'response': response})
+
 if __name__ == '__main__':
     app.run(debug=True) 
