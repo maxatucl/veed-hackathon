@@ -245,6 +245,26 @@ def find_moment(video_path, query):
 
     return result
 
+def ask_question(video_path, prompt):
+    video = sieve.File(url=video_path)
+    prompt = prompt
+    start_time = 0
+    end_time = -1
+    backend = "sieve-fast"
+    output_schema = {}
+
+    ask = sieve.function.get("sieve/ask")
+    output = ask.run(
+        video = video,
+        prompt = prompt,
+        start_time = start_time,
+        end_time = end_time,
+        backend = backend,
+        output_schema = output_schema
+    )
+
+    return output
+
 @app.route('/query', methods=['POST'])
 def handle_query():
     data = request.json

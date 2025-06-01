@@ -178,6 +178,29 @@ function App() {
         )}
       </div>
 
+      <div style={{ marginTop: 40, padding: 10, border: '1px solid #ccc', borderRadius: 8 }}>
+        <h2>Ask a Question</h2>
+        <h4>Prompt for a summary or further explanation</h4>
+        <input
+          type="text"
+          value={query}
+          onChange={e => setQuery(e.target.value)}
+          placeholder="Enter your query here"
+          style={{ width: '80%', padding: 8, fontSize: 16, borderRadius: 4, border: '1px solid #aaa' }}
+        />
+        <button
+          onClick={handleQuerySubmit}
+          style={{ marginLeft: 10, padding: '8px 16px', fontSize: 16, borderRadius: 4 }}
+        >
+          Submit
+        </button>
+        {response && (
+          <div style={{ marginTop: 20, whiteSpace: 'pre-wrap' }}>
+            <strong>Response:</strong> {response}
+          </div>
+        )}
+      </div>
+
 
       {previewUrl && (
         <div className="preview">
