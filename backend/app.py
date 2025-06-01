@@ -246,7 +246,7 @@ def find_moment(video_path, query):
     return result
 
 def ask_question(video_path, prompt):
-    video = sieve.File(url=video_path)
+    video = sieve.File(path=video_path)
     prompt = prompt
     start_time = 0
     end_time = -1
