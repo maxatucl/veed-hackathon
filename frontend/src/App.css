@@ -8,7 +8,7 @@ body {
 .App {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 40px 20px;
+  padding: 30px 20px;
   background-color: white;
   border-radius: 12px;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
@@ -17,8 +17,8 @@ body {
 h1 {
   color: #2c3e50;
   text-align: center;
-  margin-bottom: 40px;
-  font-size: 2.5em;
+  margin-bottom: 25px;
+  font-size: 2em;
   font-weight: 700;
 }
 
@@ -26,10 +26,10 @@ h1 {
 .dropzone {
   border: 2px dashed #6c63ff;
   border-radius: 12px;
-  padding: 40px;
+  padding: 25px;
   text-align: center;
   cursor: pointer;
-  margin: 20px 0;
+  margin: 15px 0;
   background-color: #f8f9fa;
   transition: all 0.3s ease-in-out;
   position: relative;
@@ -50,17 +50,17 @@ h1 {
 /* Language selector styles */
 .language-select-container {
   background-color: white;
-  padding: 20px;
+  padding: 15px;
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-  margin: 30px 0;
+  margin: 20px 0;
 }
 
 select {
   border: 1px solid #ddd;
-  padding: 10px;
+  padding: 8px;
   border-radius: 6px;
-  font-size: 16px;
+  font-size: 14px;
   color: #444;
   background-color: white;
   transition: all 0.2s;
@@ -79,24 +79,24 @@ select:focus {
 
 /* Avatar section styles */
 .avatar-section {
-  margin-top: 40px;
+  margin-top: 25px;
   background-color: white;
-  padding: 30px;
+  padding: 20px;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .avatar-section h3 {
   color: #2c3e50;
-  margin-bottom: 25px;
+  margin-bottom: 20px;
   text-align: center;
-  font-size: 1.5em;
+  font-size: 1.3em;
 }
 
 .avatar-container {
   display: flex;
   flex-direction: column;
-  gap: 30px;
+  gap: 20px;
   align-items: center;
 }
 
@@ -104,7 +104,7 @@ select:focus {
   width: 100%;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 25px;
+  gap: 15px;
 }
 
 .avatar-button {
@@ -131,14 +131,15 @@ select:focus {
 
 .avatar-button img {
   width: 100%;
-  height: 140px;
+  height: 110px;
   object-fit: cover;
   border-radius: 8px 8px 0 0;
 }
 
 .avatar-button p {
-  margin: 12px 0;
+  margin: 8px 0;
   color: #2c3e50;
+  font-size: 0.9em;
   font-weight: 500;
 }
 
@@ -156,7 +157,7 @@ select:focus {
 }
 
 .custom-avatar-button .upload-placeholder {
-  height: 140px;
+  height: 110px;
   width: 100%;
   display: flex;
   flex-direction: column;
@@ -168,6 +169,7 @@ select:focus {
 .custom-avatar-button .upload-placeholder p {
   color: #6c63ff;
   margin: 0;
+  font-size: 0.9em;
 }
 
 .custom-avatar-button .upload-placeholder small {
@@ -177,9 +179,9 @@ select:focus {
 
 /* Preview section */
 .preview {
-  margin-top: 40px;
+  margin-top: 25px;
   background-color: white;
-  padding: 30px;
+  padding: 20px;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
@@ -187,12 +189,16 @@ select:focus {
 .preview video {
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  max-height: 400px;
+  width: auto;
+  margin: 0 auto;
+  display: block;
 }
 
 .preview button {
-  margin-top: 20px;
-  padding: 12px 24px;
-  font-size: 16px;
+  margin-top: 15px;
+  padding: 10px 20px;
+  font-size: 14px;
   background-color: #6c63ff;
   color: white;
   border: none;
@@ -223,7 +229,7 @@ select:focus {
 .result-page {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 40px 20px;
+  padding: 30px 20px;
   background-color: white;
   border-radius: 12px;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
@@ -233,12 +239,12 @@ select:focus {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 40px;
+  margin-bottom: 25px;
 }
 
 .back-button {
-  padding: 12px 24px;
-  font-size: 16px;
+  padding: 10px 20px;
+  font-size: 14px;
   background-color: #6c63ff;
   color: white;
   border: none;
@@ -256,9 +262,9 @@ select:focus {
 }
 
 .video-container {
-  margin-bottom: 40px;
+  margin-bottom: 25px;
   background-color: #f8f9fa;
-  padding: 30px;
+  padding: 20px;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
@@ -267,36 +273,46 @@ select:focus {
   width: 100%;
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  max-height: 450px;
+  width: auto;
+  margin: 0 auto;
+  display: block;
 }
 
 .interaction-section {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 30px;
+  gap: 20px;
 }
 
 .interaction-box {
   background-color: white;
-  padding: 30px;
+  padding: 20px;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .interaction-box h2 {
   color: #2c3e50;
-  margin: 0 0 15px 0;
+  margin: 0 0 10px 0;
+  font-size: 1.2em;
+}
+
+.interaction-box p {
+  font-size: 0.9em;
+  margin-bottom: 15px;
 }
 
 .input-group {
   display: flex;
-  gap: 12px;
-  margin-bottom: 20px;
+  gap: 10px;
+  margin-bottom: 15px;
 }
 
 .input-group input {
   flex: 1;
-  padding: 12px;
-  font-size: 16px;
+  padding: 8px 12px;
+  font-size: 14px;
   border: 1px solid #ddd;
   border-radius: 8px;
   outline: none;
@@ -314,8 +330,8 @@ select:focus {
 }
 
 .input-group button {
-  padding: 12px 24px;
-  font-size: 16px;
+  padding: 8px 16px;
+  font-size: 14px;
   background-color: #6c63ff;
   color: white;
   border: none;
@@ -325,7 +341,7 @@ select:focus {
   display: flex;
   align-items: center;
   gap: 8px;
-  min-width: 120px;
+  min-width: 100px;
   justify-content: center;
 }
 
@@ -346,15 +362,16 @@ select:focus {
 
 .response {
   background-color: #f8f9fa;
-  padding: 20px;
+  padding: 15px;
   border-radius: 8px;
-  margin-top: 20px;
+  margin-top: 15px;
+  font-size: 0.9em;
 }
 
 .response strong {
   color: #2c3e50;
   display: block;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
 }
 
 @media (min-width: 768px) {
