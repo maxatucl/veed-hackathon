@@ -111,10 +111,15 @@ function GeneratePage() {
   return (
     <div className="App">
       <h1>Avatarcademy</h1>
-      <div {...getRootProps()} className="dropzone">
+      <div {...getRootProps()} className={`dropzone ${previewUrl ? 'has-preview' : ''}`}>
         <input {...getInputProps()} />
         {isDragActive ? (
           <p>Drop the video here...</p>
+        ) : previewUrl ? (
+          <div className="video-preview">
+            <video src={previewUrl} controls />
+            <p>Drop a new video to replace</p>
+          </div>
         ) : (
           <p>Drag and drop a video here, or click to select a video</p>
         )}
@@ -211,7 +216,6 @@ function GeneratePage() {
 
       {previewUrl && (
         <div className="preview">
-          <video src={previewUrl} controls width="100%" />
           <button 
             onClick={handleUpload}
             disabled={isLoading || !selectedAvatar}

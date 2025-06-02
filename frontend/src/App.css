@@ -33,6 +33,11 @@ h1 {
   background-color: #f8f9fa;
   transition: all 0.3s ease-in-out;
   position: relative;
+  min-height: 100px;
+}
+
+.dropzone.has-preview {
+  padding: 15px;
 }
 
 .dropzone:hover {
@@ -44,6 +49,26 @@ h1 {
 .dropzone p {
   color: #666;
   font-size: 1.1em;
+  margin: 0;
+}
+
+.video-preview {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.video-preview video {
+  max-width: 100%;
+  max-height: 250px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.video-preview p {
+  font-size: 0.9em;
+  color: #666;
   margin: 0;
 }
 
@@ -184,6 +209,8 @@ select:focus {
   padding: 20px;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  display: flex;
+  justify-content: center;
 }
 
 .preview video {

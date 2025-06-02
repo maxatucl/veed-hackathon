@@ -6,72 +6,42 @@ from moviepy.editor import VideoFileClip, AudioFileClip
 import shutil
 from dotenv import dotenv_values
 from elevenlabs.client import ElevenLabs
-from elevenlabs import play
 import json
 import subprocess
 from werkzeug.utils import secure_filename
 
-app = Flask(__name__)
-CORS(app)
+# Constants
+UPLOAD_FOLDER = "uploads"
+OUTPUT_FOLDER = "output"
+AUDIO_FOLDER = "audio"
+AVATARS_FOLDER = "avatars"
+FOLDERS = [UPLOAD_FOLDER, OUTPUT_FOLDER, AUDIO_FOLDER, AVATARS_FOLDER]
 
-# Create uploads directory if it doesn't exist
-UPLOAD_FOLDER = 'uploads'
-OUTPUT_FOLDER = 'output'
-if not os.path.exists(UPLOAD_FOLDER):
-    os.makedirs(UPLOAD_FOLDER)
-if not os.path.exists(OUTPUT_FOLDER):
-    os.makedirs(OUTPUT_FOLDER)
-AUDIO_FOLDER = 'audio'
-if not os.path.exists(AUDIO_FOLDER):
-    os.makedirs(AUDIO_FOLDER)
-AVATARS_FOLDER = 'avatars'
-if not os.path.exists(AVATARS_FOLDER):
-    os.makedirs(AVATARS_FOLDER)
+for folder in FOLDERS:
+    os.makedirs(folder, exist_ok=True)
 
-# Clean up any existing Custom.jpg on startup
-custom_avatar_path = os.path.join(AVATARS_FOLDER, "Custom.jpg")
-if os.path.exists(custom_avatar_path):
-    try:
-        os.remove(custom_avatar_path)
-    except:
-        print("Could not remove existing Custom.jpg")
-
-overlayed_video_path = OUTPUT_FOLDER + "/" + "out.mp4"
-if os.path.exists(overlayed_video_path):
-    try:
-        os.remove(overlayed_video_path)
-    except:
-        print("Could not remove existing out.mp4")
-
-peter_griffin_video = OUTPUT_FOLDER + "/" + "generated_avatar_peter.mp4"
-if os.path.exists(peter_griffin_video):
-    try:
-        os.remove(peter_griffin_video)
-    except:
-        print("Could not remove existing generated_avatar_peter.mp4")
-
-# voice dictionary
-voices = {
+# Voice mappings
+VOICE_MAPPINGS = {
     "Alan": "openai-echo (no voice cloning)",
     "Carlos": "elevenlabs-alberto (no voice cloning)",
     "Katarina": "openai-nova (no voice cloning)",
     "Michael": "openai-onyx (no voice cloning)",
     "Professor": "sieve-default-cloning",
     "Peter": "openai-echo (no voice cloning)",
-    "Priya": "openai-shimmer (no voice cloning)"
+    "Priya": "openai-shimmer (no voice cloning)",
+    "Custom": "openai-echo (no voice cloning)"
 }
 
-config = dotenv_values(".env")
- 
-client = ElevenLabs(
-    api_key=config["ELEVENLABS_API_KEY"]
-)
- 
-params = {
-    "similarity": 0.0,
-    "stability": 0.5,
-    "style": 1.0
-}
+app = Flask(__name__)
+CORS(app)
+
+# Clean up any existing Custom.jpg on startup
+custom_avatar_path = os.path.join(AVATARS_FOLDER, "Custom.jpg")
+if os.path.exists(custom_avatar_path):
+    try:
+        os.remove(custom_avatar_path)
+    except Exception as e:
+        print(f"Could not remove existing Custom.jpg: {str(e)}")
 
 @app.route('/upload', methods=['POST'])
 def upload_video():
@@ -84,11 +54,6 @@ def upload_video():
 
     # Get avatar name first
     avatar_name = request.form.get('avatar', 'Alan')  # Default to 'Alan'
-    
-    # Check for custom avatar
-    custom_avatar_path = os.path.join(AVATARS_FOLDER, "Custom.jpg")
-    if avatar_name == "Custom" and not os.path.exists(custom_avatar_path):
-        return jsonify({'error': 'Custom avatar not found'}), 400
 
     # Get target language from request (None if not selected)
     target_language = request.form.get('language', None)
@@ -105,63 +70,44 @@ def upload_video():
     # Generate avatar from audio
     avatar_generation(video_file.filename, avatar_name)
 
-    # Peter voice changer extra case
-    if(avatar_name == "Peter"):
-        video = OUTPUT_FOLDER + "/" + "generated_avatar.mp4"
-        voiceChangerResponse = client.speech_to_speech.convert(
-            voice_id="73bEoGuG1oV5QCnHySQj",
-            output_format="mp3_44100_128",
-            model_id="eleven_multilingual_sts_v2",
-            audio=open(video, "rb"),
-            voice_settings=json.dumps(params),
-        )
-
-        with open("temp.mp3", "wb") as f:
-            for x in voiceChangerResponse:
-                f.write(x)
-        
-        # Load the video and audio
-        video = VideoFileClip(video)
-        audio = AudioFileClip("temp.mp3")
-
-        # Set the new audio
-        video_with_new_audio = video.set_audio(audio)
-
-        # Export the result
-        video_with_new_audio.write_videofile(OUTPUT_FOLDER + "/" + "generated_avatar_peter.mp4")
-
-    avatar_video_string = OUTPUT_FOLDER + "/" + "generated_avatar_peter.mp4" if avatar_name == "Peter" else OUTPUT_FOLDER + "/" + "generated_avatar.mp4"
+    avatar_video_string = OUTPUT_FOLDER + "/" + "generated_avatar.mp4"
     
     # Run your overlay function
-    output_video = overlay_video(avatar_video_string, filename)
-
-    # Get audio from the original avatar video
-    original_video = VideoFileClip(avatar_video_string)
-    original_audio = original_video.audio
-
-    # Optional: write to .wav if needed (e.g., for ElevenLabs or debugging)
-    audio_path = os.path.join(AUDIO_FOLDER, "out.wav")
-    original_audio.write_audiofile(audio_path)
-
-    # Load new video (with overlay but no audio)
-    video_no_audio = VideoFileClip(output_video)
-
-    # Attach the original audio to the new video
-    final_video = video_no_audio.set_audio(original_audio)
-
-    # Save final result
-    final_video.write_videofile(os.path.join(OUTPUT_FOLDER, "final_video.mp4"))
+    overlay_video(avatar_video_string, filename)
     
     return jsonify({
         'message': 'Video processed successfully',
         'video_url': 'final_video.mp4'
     })
 
+def peter_voice_changer(audio_path):
+    config = dotenv_values(".env")
+    client = ElevenLabs(
+        api_key=config["ELEVENLABS_API_KEY"]
+    )
+    params = {
+        "similarity": 0.0,
+        "stability": 0.5,
+        "style": 1.0
+    }
+
+    voiceChangerResponse = client.speech_to_speech.convert(
+        voice_id="73bEoGuG1oV5QCnHySQj",
+        output_format="mp3_44100_128",
+        model_id="eleven_multilingual_sts_v2",
+        audio=open(audio_path, "rb"),
+        voice_settings=json.dumps(params),
+    )
+
+    with open(audio_path + ".mp3", "wb") as f:
+        for x in voiceChangerResponse:
+            f.write(x)
+
 def overlay_video(avatar_video_path, background_video_path):
     foreground_video_path = remove_background(avatar_video_path)
 
     # Define input and output file paths
-    output_video = OUTPUT_FOLDER + "/" + "out.mp4"
+    output_video = os.path.join(OUTPUT_FOLDER, "final_video.mp4")
 
     # Construct the FFmpeg filter_complex
     filter_complex = (
@@ -176,10 +122,12 @@ def overlay_video(avatar_video_path, background_video_path):
     # Build the full ffmpeg command
     command = [
         "ffmpeg",
+        "-y",
         "-i", background_video_path,
         "-i", foreground_video_path,
         "-filter_complex", filter_complex,
         "-map", "[out]",
+        "-map", "1:a",
         output_video
     ]
 
@@ -193,7 +141,6 @@ def overlay_video(avatar_video_path, background_video_path):
         return None
 
 def remove_background(video_path):
-
     input_file = sieve.File(path=video_path)
 
     backend = "parallax"
@@ -219,13 +166,12 @@ def remove_background(video_path):
         end_frame = end_frame,
         vanish_allow_scene_splitting = vanish_allow_scene_splitting
     )
-    output_path = OUTPUT_FOLDER + "/" + "avatar_no_background.mp4"
+    output_path = os.path.join(OUTPUT_FOLDER, "avatar_no_background.mp4")
+    
     for output_object in outputs:
-        path = output_object.path
-
         # Copy the file from Sieve's output path to our output folder
-        shutil.copy2(path, output_path)
-        print("copied file to " + output_path)
+        shutil.copy2(output_object.path, output_path)
+        print(f"copied file to {output_path}")
 
     return output_path
 
@@ -245,7 +191,7 @@ def translate_audio(audio_path, language, avatar_name):
     source_file = sieve.File(path=audio_path)
     target_language = "english" if language is None else language
     translation_engine = "sieve-default-translator"
-    voice_engine = "openai-echo (no voice cloning)" if avatar_name == "Custom" else voices[avatar_name]  # default "sieve-default-cloning"
+    voice_engine = VOICE_MAPPINGS[avatar_name]  # default "sieve-default-cloning"
     transcription_engine = "sieve-transcribe"
     output_mode = "voice-dubbing"
     edit_segments = []
@@ -284,11 +230,14 @@ def translate_audio(audio_path, language, avatar_name):
         # Copy the file from Sieve's output path to our output folder
         shutil.copy2(path, audio_path)
         print("copied file to " + audio_path)
+
+    if avatar_name == "Peter":
+        peter_voice_changer(audio_path)
     
 def avatar_generation(filename, avatar_name):
     img_path = os.path.join(AVATARS_FOLDER, avatar_name + ".jpg")
     source_image = sieve.File(path=img_path)
-    audio_path = os.path.join(AUDIO_FOLDER, filename + ".wav")
+    audio_path = os.path.join(AUDIO_FOLDER, filename + ".wav" + (".mp3" if avatar_name == "Peter" else ""))
     driving_audio = sieve.File(path=audio_path)
     backend = "hedra-character-2"
     aspect_ratio = "-1"
